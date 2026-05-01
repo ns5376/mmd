@@ -678,6 +678,47 @@ def index():
     return render_template("index.html", jobs=list_jobs())
 
 
+def run_conversion_job(job_id: str, pdf_path: Path, stem: str) -> None:
+    """Background thread: convert PDF to images and update job state."""
+    job_dir = JOBS_DIR / job_id
+    image_dir = job_dir / "images"
+    try:
+        pdf_hash = sha256_file(pdf_path)
+        update_job(job_id, progress_detail="Checking conversion cache...")
+        cached = load_cached_conversion(pdf_hash)
+        page_count = cached.get("page_count")
+        cache_hit = False
+        if cached and isinstance(page_count, int) and page_count > 0 and cache_images_dir(pdf_hash).exists():
+            update_job(job_id, progress_detail="Restoring pages from cache...")
+            populate_job_images_from_cache(pdf_hash, image_dir)
+            cache_hit = True
+        else:
+            update_job(job_id, progress_detail="Counting pages...")
+            page_count = get_pdf_page_count(pdf_path)
+            update_job(job_id, progress_detail=f"Converting {page_count} pages to images (this may take a few minutes)...")
+            convert_pdf_to_images(pdf_path, image_dir, stem)
+            update_job(job_id, progress_detail="Saving pages to cache...")
+            cache_converted_images(pdf_hash, image_dir)
+            save_cached_conversion(pdf_hash, page_count=page_count, stem=stem)
+        update_job(job_id, progress_detail="Building page previews...")
+        page_items = build_page_items(job_id)
+        update_job(
+            job_id,
+            status="ready",
+            stage="select_range",
+            page_count=page_count,
+            page_items=page_items,
+            prompt_overrides={},
+            editable_prompts=load_base_prompts(),
+            progress=stage_progress("select_range", "ready"),
+            progress_detail="Reused cached page images" if cache_hit else "Converted PDF and saved page images to cache",
+            cache_hit=cache_hit,
+            pdf_hash=pdf_hash,
+        )
+    except Exception as exc:
+        update_job(job_id, status="failed", stage="error", error=str(exc), progress=100, progress_detail="Conversion failed")
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     file = request.files.get("pdf")
@@ -705,36 +746,16 @@ def upload():
         pdf_name=safe_name,
         created_at=now_iso(),
         progress=stage_progress("conversion", "preparing"),
-        progress_detail="Checking conversion cache...",
+        progress_detail="Starting PDF conversion...",
         stop_available=False,
     )
-    stem = pdf_path.stem
-    pdf_hash = sha256_file(pdf_path)
-    cached = load_cached_conversion(pdf_hash)
-    page_count = cached.get("page_count")
-    cache_hit = False
-    if cached and isinstance(page_count, int) and page_count > 0 and cache_images_dir(pdf_hash).exists():
-        populate_job_images_from_cache(pdf_hash, image_dir)
-        cache_hit = True
-    else:
-        page_count = get_pdf_page_count(pdf_path)
-        convert_pdf_to_images(pdf_path, image_dir, stem)
-        cache_converted_images(pdf_hash, image_dir)
-        save_cached_conversion(pdf_hash, page_count=page_count, stem=stem)
-    page_items = build_page_items(job_id)
-    update_job(
-        job_id,
-        status="ready",
-        stage="select_range",
-        page_count=page_count,
-        page_items=page_items,
-        prompt_overrides={},
-        editable_prompts=load_base_prompts(),
-        progress=stage_progress("select_range", "ready"),
-        progress_detail="Reused cached page images" if cache_hit else "Converted PDF and saved page images to cache",
-        cache_hit=cache_hit,
-        pdf_hash=pdf_hash,
+
+    thread = threading.Thread(
+        target=run_conversion_job,
+        args=(job_id, pdf_path, pdf_path.stem),
+        daemon=True,
     )
+    thread.start()
     return redirect(url_for("job_view", job_id=job_id))
 
 

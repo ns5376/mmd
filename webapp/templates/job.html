@@ -54,11 +54,11 @@
         <div><span class="stat-label">Status</span><span class="stat-value stat-text"><strong id="job_status">{{ job.status }}</strong> · <strong id="stage_hero">{{ job.stage }}</strong></span></div>
       </section>
 
-      {% if job.status in ["running", "stopped", "completed", "failed"] %}
+      {% if job.status in ["preparing", "running", "stopped", "completed", "failed"] %}
       <section class="panel">
         <div class="progress-head">
           <div>
-            <h2>Run Status</h2>
+            <h2>{% if job.status == "preparing" %}Converting PDF{% else %}Run Status{% endif %}</h2>
             <p class="lede small">Current stage: <strong id="stage_label">{{ job.stage }}</strong> · Observed progress: <strong id="progress_value">{{ job.progress or 0 }}%</strong></p>
           </div>
           {% if job.status == "running" and job.stop_available and job.stage != "done" %}
@@ -177,7 +177,7 @@
       {% endif %}
     </main>
 
-    {% if job.status == "running" %}
+    {% if job.status in ["preparing", "running"] %}
     <script>
       const progressFill = document.getElementById("progress_fill");
       const stageLabel = document.getElementById("stage_label");
@@ -233,6 +233,11 @@
           const atBottom = terminalLog.scrollHeight - terminalLog.scrollTop <= terminalLog.clientHeight + 40;
           terminalLog.textContent = data.live_log || "";
           if (atBottom) terminalLog.scrollTop = terminalLog.scrollHeight;
+        }
+        if (data.status === "ready") {
+          // Conversion finished — reload so the run form appears
+          window.location.reload();
+          return;
         }
         if (data.status === "completed" || data.status === "failed" || data.status === "stopped") {
           renderBanner(data.status, data.error || data.current_output);
