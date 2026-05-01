@@ -23,6 +23,7 @@ import ssl
 import sys
 import time
 import urllib.request
+from pathlib import Path
 from urllib.error import HTTPError
 from datetime import datetime
 from typing import List, Tuple
