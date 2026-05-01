@@ -80,6 +80,7 @@
         <pre id="terminal_log" style="background:#0d1117;color:#c9d1d9;font-size:12px;line-height:1.5;padding:14px 16px;border-radius:8px;overflow-x:auto;overflow-y:auto;max-height:420px;white-space:pre-wrap;word-break:break-all;">{{ job.live_log or "" }}</pre>
       </section>
       {% endif %}
+      {% endif %}
 
       {% if job.status in ["ready", "completed", "failed", "stopped"] %}
       <section class="panel">
