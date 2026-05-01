@@ -28,7 +28,7 @@ JOBS_DIR = Path(os.environ.get("JOBS_DIR", str(WEBAPP_DIR / "jobs"))).resolve()
 CACHE_DIR = Path(os.environ.get("CACHE_DIR", str(JOBS_DIR.parent / "cache"))).resolve()
 PIPELINE_SCRIPT = BASE_DIR / "pipeline.py"
 WAAMD_SCRIPT = BASE_DIR / "add_waamd_author_ids.py"
-WAAMD_XLSX = BASE_DIR / "waamd.xlsx"
+WAAMD_CSV = BASE_DIR / "waamd.csv"
 PROMPTS_DIR = BASE_DIR / "prompts"
 ALLOWED_EXTENSIONS = {"pdf"}
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
@@ -559,7 +559,7 @@ def build_job_workspace(job_id: str, prompt_overrides: dict) -> Path:
     workspace.mkdir(parents=True, exist_ok=True)
     shutil.copy2(PIPELINE_SCRIPT, workspace / "pipeline.py")
     shutil.copy2(WAAMD_SCRIPT, workspace / "add_waamd_author_ids.py")
-    shutil.copy2(WAAMD_XLSX, workspace / "waamd.xlsx")
+    shutil.copy2(WAAMD_CSV, workspace / "waamd.csv")
     shutil.copytree(PROMPTS_DIR, prompts_target)
     for name, content in prompt_overrides.items():
         (prompts_target / name).write_text(content, encoding="utf-8")
@@ -626,7 +626,7 @@ def run_pipeline_job(job_id: str, start_page: int, end_page: int, prompt_overrid
             "--output",
             str(waamd_output),
             "--waamd",
-            str(workspace / "waamd.xlsx"),
+            str(workspace / "waamd.csv"),
         ]
         run_streaming_command(waamd_cmd, cwd=job_dir, job_id=job_id, stage="waamd", env=env)
 
