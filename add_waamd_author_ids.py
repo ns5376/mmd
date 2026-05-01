@@ -81,7 +81,13 @@ def _load_waamd_from_csv(csv_path: str):
                 continue
             if waamd_id.endswith(".0") and waamd_id[:-2].isdigit():
                 waamd_id = waamd_id[:-2]
-            records.append({"waamd_id": waamd_id, "eng_name": eng_name, "ar_name": ar_name})
+            records.append({
+                "waamd_id": waamd_id,
+                "eng_name": eng_name,
+                "ar_name": ar_name,
+                "eng_norm": normalize_english(eng_name),
+                "eng_token_sort": token_sort_key(eng_name),
+            })
     return records
 
 

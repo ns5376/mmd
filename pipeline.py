@@ -250,14 +250,16 @@ def parse_tsv_two_cols(response_text: str, expected_n: int) -> List[Tuple[str, s
     """
     out: List[Tuple[str, str]] = []
     for raw in (response_text or "").splitlines():
-        raw = raw.strip()
-        if not raw:
+        if not raw.strip():
             continue
         if "\t" in raw:
-            en, ar = raw.split("\t", 1)
-            out.append((en.strip(), ar.strip()))
+            parts = raw.split("\t")
+            en = parts[0].strip()
+            ar = parts[1].strip() if len(parts) > 1 else ""
+            # Ignore any 3rd+ columns (e.g. nisba prompt outputs ENGLISH<TAB>ARABIC<TAB>AUTHOR_KEY)
+            out.append((en, ar))
         else:
-            out.append((raw, ""))
+            out.append((raw.strip(), ""))
     if len(out) < expected_n:
         out.extend([("", "")] * (expected_n - len(out)))
     if len(out) > expected_n:
@@ -697,11 +699,12 @@ if __name__ == "__main__":
             else:
                 print("  [3b/15] Author romanization skipped (no authors on page).", flush=True)
 
-            # 3c. Author nisba extraction (text-only; ONLY author names; no other context)
+            # 3c. Author nisba extraction (text-only; ALL author lines including empty to preserve alignment)
             if _non_empty_authors:
                 print("  [3c/15] Author nisba (text-only)...", flush=True)
                 nisba_template = load_prompt_file(AUTHOR_NISBA_PROMPT_PATH)
-                author_lines_for_nisba = "\n".join(_non_empty_authors)
+                # Send ALL author lines (including empty) so model output aligns 1:1 with authors list
+                author_lines_for_nisba = "\n".join(a.strip() for a in authors)
                 nisba_prompt = nisba_template.replace("<PASTE ARABIC AUTHOR NAMES HERE>", author_lines_for_nisba)
                 raw_author_nisba = run_text_only(nisba_prompt, max_tokens=512)
             else:

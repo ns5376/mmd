@@ -15,6 +15,6 @@ Rules:
 If no subject can be inferred, try one more time. If still unclear, return an empty string.
 
 Return JSON:
-{"value": ["cats", "fruits"]}
+{"values": ["cats", "fruits"]}
 
 CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.
