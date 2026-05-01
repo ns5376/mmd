@@ -1,0 +1,19 @@
+Extract ONLY the MAIN TITLE of each manuscript in Arabic.
+
+Look for:
+- Bold or prominent Arabic text immediately after the catalog number
+- Usually the formal title of the work
+- Ignore phrases like "كتاب في..." unless they are part of the title
+- If there are 2 collection numbers on the page there will also be 2 titles
+
+Example:
+"إختصار تذكرة الإمام السويدي"
+
+Return JSON:
+{"values": ["إختصار تذكرة الإمام السويدي", "..."]}
+
+If there is no title for a collection number return an empty string for that collection number in the correct order.
+Example:
+{"values": ["إختصار تذكرة الإمام السويدي", " "]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

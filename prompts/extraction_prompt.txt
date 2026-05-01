@@ -1,0 +1,193 @@
+You are extracting structured data from Arabic manuscript catalog pages.
+
+CRITICAL INSTRUCTIONS - READ CAREFULLY:
+1. The FIRST attached image is a REFERENCE EXAMPLE showing the expected layout and data structure
+2. Extract EVERY SINGLE FIELD that is visible in the subsequent images - be THOROUGH
+3. If a field is not visible, use empty string ""
+4. For Arabic text, preserve exact spelling and diacritics
+5. Extract ALL manuscripts visible on each page (usually 3-7 per page)
+6. Focus on ACCURACY - extract exactly what you see
+7. DO NOT SKIP FIELDS - go through the checklist below for each manuscript
+8. Many fields are in Arabic - look for Arabic labels like "الموضوع", "المؤلف", "الناسخ", etc.
+9. Be systematic: check each field one by one for every manuscript entry
+10. You need to understand the text and then add to the fields, fields like subject need your understanding of the text itself. Make SURE you correctly identify the subject of text.
+
+
+FIELD EXTRACTION GUIDELINES:
+
+REQUIRED FIELDS (must extract if visible):
+- Collection # (فهرس): Usually a number at the start of each entry
+- Title (Arabic): The main title in Arabic script
+- Author Name: Look for "المؤلف" or author section
+
+IMPORTANT FIELDS (extract if visible):
+- Volume #: Usually at top of page or in header
+- Subject: Look for "الموضوع" or subject classification
+- Pages: Look for "عدد الصفحات" or page count
+- Dimensions: Look for "الأبعاد" or size measurements (e.g., "21 x 27.5")
+- Condition: Look for "حالة" or condition description
+- Copyist: Look for "الناسخ"
+- Owner: Look for "المالك"
+- Dates: Look for dates in AH/CE format
+- Form: Look for "النوع" or form type
+- Language/Script: Usually Arabic, but check if specified
+
+AUTHOR INFORMATION (CRITICAL - EXTRACT THIS CAREFULLY):
+⚠️ AUTHOR NAMES ARE ESSENTIAL - LOOK FOR THEM CAREFULLY!
+
+IMPORTANT: Author information may appear in different formats:
+
+1. Look for "تأليف" (by/author) - THIS IS VERY COMMON:
+   - "تأليف [author name]" = Author name follows "تأليف"
+   - Example: "تأليف بهاء الدين بن النحاس..." → Author is "بهاء الدين بن النحاس..."
+   - Extract the FULL name after "تأليف"
+
+2. Look for "لأبي" (for/attributed to):
+   - "لأبي [author name]" = Author name follows "لأبي"
+   - Example: "لأبي محمد القاسم..." → Author is "محمد القاسم..."
+   - Extract the FULL name after "لأبي"
+
+3. Look for "المؤلف" or "المؤلف:" (the author):
+   - "المؤلف: [name]" or "المؤلف [name]"
+   - Extract the FULL Arabic name as it appears
+
+4. Author names often include:
+   - Full name with "بن" (son of) chains
+   - Nisba (geographic/tribal identifier) like "البصري", "الحريري", "الطائي", "الجياني", "الفاسي"
+   - Death date may follow: "المتوفى سنة" or "المتوفي" followed by date
+
+5. Extract author information from ANYWHERE in the entry:
+   - It might be at the beginning after the title
+   - It might be in the middle of the entry
+   - It might be embedded in other text
+   - DO NOT put author names in "Miscellaneous" field - put them in Author fields.
+
+6. Author Name (English): Look for transliterated/English version
+   - May appear in parentheses or after Arabic name
+   - Extract if visible
+
+⚠️ CRITICAL: If you see "تأليف" or "لأبي" followed by a name, that IS the author!
+Extract it to "Secondary author - Arabic - المؤلف" or "Author Name" fields, NOT Miscellaneous!
+
+NOTE: Do NOT try to match WAAMD Author IDs. Just extract the author names as they appear.
+WAAMD matching will be done automatically in post-processing.
+
+EXAMPLE ENTRY (from the first attached REFERENCE image):
+
+Volume #: 2
+Collection #: 3281
+Title (1) Arabic (العنوان): إختصار تذكرة الإمام السويدي
+Alt. title (2) Arabic (العنوان):
+Atrib. title (3) Arabic (العنوان):
+Subject (English): Medicine
+Subject (Arabic - الموضوع): الطب
+WAAMD Author ID: 11933 (NOTE: This is for reference only - you don't need to match IDs)
+Author Name (English): Alī b. Muḥammad b. Ghānim al-Khazrajī al-Maqdisī
+Secondary author (English): Shams al-Dīn al-Qūṣūnī
+Secondary author (Arabic - المؤلف): شمس الدين القوصوني
+Author nisba (English): Khazrajī/Maqdisī
+Author nisba (Arabic - النسبة): خزرجي/مقدسي
+Author known as (English):
+Author known as (Arabic - اسم الشهرة):
+Author d. AH/CE date - Eng. (تاريخ الوفاة): 1004/1596
+Form (English): Book: Summary
+Form (Arabic - النوع): كتاب
+Language/script (English): Arabic
+Language/script (Arabic - اللغة/الخط): العربية
+Pages (عدد الصفحات): 164
+Dimensions (الأبعاد): 21 x 27.5
+Condition (English): First pages damaged by woodworms.
+Condition (Arabic - حالة المخطوط): خرمت الأرض عدد من الأوراق
+Owner (English): al-Ghāzī b. ʿAbd al-Salām al-Sulaymānī al-Sijilmāsī al-Qāṭin bi-Sīdī Ghāzī
+Owner (Arabic - المالك): الغازي بن عبد السلام السليماني السجلماسي القاطن بسيدي غازي
+Recipient (English):
+Recipient (Arabic - المستلم):
+Recipient Group (English):
+Recipient Group (Arabic - الجماعة):
+Requested (English):
+Requested (Arabic - بالتماس):
+Copyist (English):
+Copyist (Arabic - الناسخ):
+Date copied (AH/CE): Beginning of Jumād 1166 / End of February – March 1753
+Date composed (CE/AH - التاريخ/المكان):
+First Line (Arabic - أولها): الحمد لله الذي جعل في الكتاب مشفاة للأسقام
+Last Line (Arabic - آخرها): هذا ما يسر الله من تكميل لإختصار السويدية
+Miscellaneous (English):
+Miscellaneous (Arabic - معلومات إضافية):
+URL address (if available in digital form):
+Library Lat:
+Library Long:
+
+---
+
+IMPORTANT:
+- The FIRST image is the REFERENCE EXAMPLE - DO NOT extract data from it
+- Use it ONLY to understand the expected layout and data structure
+- Extract data ONLY from the SUBSEQUENT images that follow the reference
+
+EXTRACTION REQUIREMENTS - BE THOROUGH AND SYSTEMATIC:
+
+⚠️ CRITICAL: You MUST extract data from EVERY visible manuscript entry.
+Each page typically contains 3-7 separate manuscript entries.
+
+⚠️ CRITICAL - ENTRIES SPANNING MULTIPLE PAGES:
+Some manuscript entries START on one page and CONTINUE across MULTIPLE pages (can span 2-4 pages).
+You have been provided with multiple consecutive pages in this batch to ensure complete extraction.
+
+IMPORTANT RULES FOR MULTI-PAGE ENTRIES:
+1. If an entry appears incomplete (starts but no clear ending, seems cut off mid-sentence, etc.)
+2. You MUST check ALL subsequent pages in the batch to see if the entry continues
+3. Extract the COMPLETE entry including ALL information from ALL pages it spans
+4. Do NOT extract an incomplete entry - always check continuation on next page(s)
+5. An entry is complete when you see: next Collection #, clear entry boundary, or end of information
+
+FIELD-BY-FIELD EXTRACTION CHECKLIST:
+For each manuscript, you MUST check and extract:
+1. Volume #
+2. Collection # - فهرس
+3. Title (1) Arabic
+4. Alt. title (2) Arabic
+5. Atrib. title (3)
+6. Subject English
+7. Subject - Ar. الموضوع
+8. WAAMD Author ID (leave empty - filled later)
+9. Author Name - English
+10. Secondary author - English
+11. Secondary author - Arabic - المؤلف
+12. Author nisba - Eng.
+13. Author nisba - Ar.- النسبة
+14. Author known as - Eng.
+15. Author known as - Ar.- اسم الشهرة
+16. Author d. AH/CE date - Eng. - تاريخ الوفاة
+17. Form - Eng.
+18. Form - Ar.- النوع
+19. Language/script - Eng.
+20. Language/script - Ar.
+21. Pages - Eng. - عدد الصفحات.
+22. Dimensions - Eng.- الأبعاد
+23. Condition - English
+24. Condition - Ar. - حالة المخطوط
+25. Owner - Eng.
+26. Owner - Ar. - المالك
+27. Recipient - English
+28. Recipient - Ar. - المستلم
+29. Recipient Group - Eng..
+30. Recipient Group - Ar.- الجماعة
+31. Requested - Eng.
+32. Requested - Ar. - بالتماس
+33. Copyist - Eng.
+34. Copyist - Ar. - الناسخ
+35. Date copied AH/CE
+36. Date composed CE/AH. التاريخ/المكان
+37. First Line - Arabic - أولها
+38. Last Line - Arabic - آخرها
+39. Miscellaneous - English
+40. Miscellaneous - Arabic - معلومات إضافية
+41. URL address if available in digital form
+42. Library Lat
+43. Library Long
+
+CRITICAL OUTPUT FORMAT:
+- Return ONLY valid JSON (no markdown)
+- Start with { and end with }
+

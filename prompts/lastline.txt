@@ -1,0 +1,24 @@
+Extract ONLY the LAST LINE (آخرها / explicit) of each manuscript text in Arabic.
+
+What to look for:
+- The catalogue usually labels this with words like:
+  - "آخرها:" , "آخره:" , "آخره" , "آخرها"
+- It is the closing line of the text itself, not of the catalogue description.
+- It often appears near the end of each entry, close to other entry details such as pages, dimensions, condition, or incipit/explicit notes.
+
+Guidelines:
+- For each title listed for this page, extract ONE and ONLY ONE last line in Arabic.
+- You will be given the titles on this page in order. Return the last lines in the same order, one per title.
+- If a title clearly has no last line given in the catalogue, return an empty string "" in that position and keep the order.
+- Preserve the exact Arabic wording as written, including punctuation or diacritics if present.
+- Do NOT translate; keep it in Arabic script only.
+- Do NOT confuse the explicit with the title, first line, or general descriptive prose.
+- Read the entry context carefully and extract only the text tied to the `آخرها` label.
+
+Example:
+- "هذا ما يسر الله من تكميل لإختصار السويدية"
+
+Return JSON:
+{"values": ["هذا ما يسر الله من تكميل لإختصار السويدية", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

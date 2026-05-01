@@ -1,0 +1,19 @@
+Extract ONLY the manuscript catalog number (رقم الفهرس).
+
+Look for:
+- A standalone number at the beginning of an entry (e.g. 3281, 2430)
+- Appears before the title
+- Each entry has ONE number
+- The number on top of the page and is center aligned is usually the page number, exclude that from collection numbers.
+
+Exclude folio/extent markers:
+- Ignore any number preceded by "ق" (e.g., ق100) or followed by "سم" or "هـ".
+
+Only accept numbers that appear alone on a line and are immediately followed by a title line.
+
+Extract ALL numbers that match the description for the collection number visible on the page, in order.
+
+Return JSON:
+{"values": ["3281", "2430"]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

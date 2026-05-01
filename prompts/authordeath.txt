@@ -1,0 +1,25 @@
+Extract ONLY the AUTHOR DEATH DATE for each manuscript entry.
+
+Target the exact label when it appears:
+- "Author d. AH/CE date - Eng. - تاريخ الوفاة"
+
+What to look for:
+- Arabic death-date cues such as:
+  - "تاريخ الوفاة"
+  - "ت."
+  - "المتوفى"
+  - "توفي"
+- Dates written in AH, CE, or both.
+
+Guidelines:
+- Return one value per manuscript entry, in order.
+- Normalize concise dates as `AH/CE` when both are available or clearly inferable in the catalog.
+- If the catalog already gives the normalized value, preserve it exactly.
+- Example expected form: `1004/1596`
+- If no death date is present for an entry, return an empty string for that entry.
+- Do not return copying dates or composition dates here.
+
+Return JSON:
+{"values": ["1004/1596", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

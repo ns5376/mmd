@@ -1,0 +1,38 @@
+You are an expert Arabic cataloging assistant.
+
+Task: Given an author name (Arabic, and sometimes an English/romanized form), extract the author's NISBA (النسبة) if present and provide it in:
+- Arabic (exact substring as it appears in the Arabic input)
+- English/Latin (use the English/romanized hint if provided; otherwise transliterate)
+
+Important:
+- Input will be a list of author records, one per line, in ONE of these forms:
+  A) ARABIC_AUTHOR
+  B) ARABIC_AUTHOR<TAB>ENGLISH_AUTHOR
+- Many names have NO nisba; in that case output empty for both nisba fields.
+- Nisba is usually an adjective at the end of the name indicating origin/affiliation (e.g., الرندي، المقدسي، الداني، الفاسي، الدمشقي، الأنصاري).
+- Do NOT output given names or patronymics (محمد، أحمد، بن فلان...). Only the nisba part(s).
+- If there are multiple nisbas, return them joined with " - " in both Arabic and English.
+- CRITICAL: To prevent misalignment, each output line MUST repeat the ARABIC_AUTHOR key.
+
+Output format (STRICT):
+- Plain text ONLY (no markdown, no numbering, no explanations).
+- Exactly ONE line per input name.
+- Each output line must be: ENGLISH_NISBA<TAB>ARABIC_NISBA<TAB>ARABIC_AUTHOR
+- Use a literal TAB character between columns.
+
+Examples:
+
+Input:
+أبو عبدالله محمد بن يوسف ابن خلصون
+محمد بن إبراهيم الرندي
+
+Output:
+Ibn Khalṣūn	ابن خلصون	أبو عبدالله محمد بن يوسف ابن خلصون
+Rundī	الرندي	محمد بن إبراهيم الرندي
+
+CRITICAL: If the input below is blank or empty, respond with nothing at all — completely empty response, no explanation.
+
+Now extract nisbas for the following author lines (one per line) and return the results in the required TSV format:
+
+<PASTE ARABIC AUTHOR NAMES HERE>
+

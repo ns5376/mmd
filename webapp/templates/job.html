@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Job {{ job.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="shell topbar-inner">
+        <a href="{{ url_for('index') }}" class="brand-mark">Manuscript Pipeline</a>
+        <nav class="topnav" aria-label="Primary">
+          <a href="{{ url_for('index') }}" class="topnav-link">Home</a>
+          <span class="topnav-sep">/</span>
+          <a href="{{ url_for('job_view', job_id=job.id) }}" class="topnav-link is-active">Job</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="shell app-shell">
+      <section class="hero compact">
+        <div class="breadcrumb-row">
+          <a href="{{ url_for('index') }}" class="crumb-link">Uploads</a>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-current">{{ job.pdf_name }}</span>
+        </div>
+        <p class="kicker">Job {{ job.id }}</p>
+        <h1>{{ job.pdf_name }}</h1>
+        <p class="lede">Open this upload, review the converted pages, choose the range you want, and run the extraction pipeline.</p>
+        <div class="hero-actions">
+          <a class="button subtle" href="{{ url_for('index') }}">Back To Uploads</a>
+          <form action="{{ url_for('delete_job', job_id=job.id) }}" method="post">
+            <button type="submit" class="button subtle danger">Delete This Upload</button>
+          </form>
+        </div>
+      </section>
+
+      {% if job.status in ["stopped", "failed", "completed"] %}
+      <section id="status_banner" class="panel notice {% if job.status == 'failed' %}notice-error{% elif job.status == 'stopped' %}notice-warn{% else %}notice-success{% endif %}">
+        <h2>{{ job.status|capitalize }}</h2>
+        <p id="status_message">{{ (job.error if job.status in ["failed", "stopped"] else "") or job.current_output or "Job finished." }}</p>
+      </section>
+      {% else %}
+      <section id="status_banner" class="panel notice is-hidden">
+        <h2 id="status_title">Update</h2>
+        <p id="status_message"></p>
+      </section>
+      {% endif %}
+
+      <section class="panel stats">
+        <div><span class="stat-label">Pages</span><span class="stat-value">{{ job.page_count or "?" }}</span></div>
+        <div><span class="stat-label">Selected Range</span><span class="stat-value">{{ job.range_start or "—" }}{% if job.range_end %}–{{ job.range_end }}{% endif %}</span></div>
+        <div><span class="stat-label">Status</span><span class="stat-value stat-text"><strong id="job_status">{{ job.status }}</strong> · <strong id="stage_hero">{{ job.stage }}</strong></span></div>
+      </section>
+
+      {% if job.status in ["running", "stopped", "completed", "failed"] %}
+      <section class="panel">
+        <div class="progress-head">
+          <div>
+            <h2>Run Status</h2>
+            <p class="lede small">Current stage: <strong id="stage_label">{{ job.stage }}</strong> · Observed progress: <strong id="progress_value">{{ job.progress or 0 }}%</strong></p>
+          </div>
+          {% if job.status == "running" and job.stop_available and job.stage != "done" %}
+          <form action="{{ url_for('stop_job', job_id=job.id) }}" method="post">
+            <button type="submit" class="button stop-button">Stop Process</button>
+          </form>
+          {% endif %}
+        </div>
+        <div class="progress-bar">
+          <div id="progress_fill" class="progress-fill" style="width: {{ job.progress or 0 }}%;"></div>
+        </div>
+        <p id="progress_detail" class="progress-detail">{{ job.progress_detail or "Waiting for process output..." }}</p>
+        <p id="current_output" class="progress-note">{{ job.current_output or "" }}</p>
+      </section>
+
+      {% if job.status in ["running", "stopped", "completed", "failed"] %}
+      <section class="panel">
+        <h2>Terminal Output</h2>
+        <pre id="terminal_log" style="background:#0d1117;color:#c9d1d9;font-size:12px;line-height:1.5;padding:14px 16px;border-radius:8px;overflow-x:auto;overflow-y:auto;max-height:420px;white-space:pre-wrap;word-break:break-all;">{{ job.live_log or "" }}</pre>
+      </section>
+      {% endif %}
+
+      {% if job.status in ["ready", "completed", "failed", "stopped"] %}
+      <section class="panel">
+        <form action="{{ url_for('run_job', job_id=job.id) }}" method="post" class="range-form">
+          <div>
+            <label for="start_page" class="label">Start Page</label>
+            <input id="start_page" name="start_page" type="number" min="1" max="{{ job.page_count }}" value="{{ job.range_start or 1 }}" required>
+          </div>
+          <div>
+            <label for="end_page" class="label">End Page</label>
+            <input id="end_page" name="end_page" type="number" min="1" max="{{ job.page_count }}" value="{{ job.range_end or job.page_count or 1 }}" required>
+          </div>
+          <div>
+            <label for="anthropic_api_key" class="label">Anthropic API Key</label>
+            <input id="anthropic_api_key" name="anthropic_api_key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-..." required>
+            <p class="field-note">Used only for this run. The server passes it to the pipeline process and does not save it to job metadata.</p>
+          </div>
+          <div class="toggle-box">
+            <label class="checkbox-line">
+              <input id="use_custom_prompts" name="use_custom_prompts" type="checkbox" {% if job.custom_prompts_enabled %}checked{% endif %}>
+              <span>Edit prompts for this PDF run only</span>
+            </label>
+          </div>
+          <p id="cost_estimate" class="field-note" style="font-weight:500;margin-top:4px;"></p>
+          <button type="submit" class="button" {% if job.status == "running" %}disabled{% endif %}>Run Pipeline</button>
+          <script>
+            (function () {
+              var startEl = document.getElementById('start_page');
+              var endEl   = document.getElementById('end_page');
+              var est     = document.getElementById('cost_estimate');
+              function update() {
+                var s = parseInt(startEl.value, 10);
+                var e = parseInt(endEl.value, 10);
+                if (isNaN(s) || isNaN(e) || e < s) { est.textContent = ''; return; }
+                var pages = e - s + 1;
+                // 11 vision calls + 4 text-only calls per page; 2-image calls (steps 4,5,7) counted once
+                var visionCalls = pages * 11;
+                var textCalls   = pages * 4;
+                est.textContent = '~' + pages + ' pages → ' + visionCalls + ' vision API calls + ' + textCalls + ' text-only calls (Haiku). Tip: run 50–100 pages at a time to control spend.';
+              }
+              startEl.addEventListener('input', update);
+              endEl.addEventListener('input', update);
+              update();
+            })();
+          </script>
+
+          <div id="prompt_editor" class="prompt-editor {% if not job.custom_prompts_enabled %}is-hidden{% endif %}">
+            <p class="lede small">These overrides are saved to this job only. The base prompt files stay unchanged.</p>
+            {% for prompt in job.editable_prompts or [] %}
+            <div class="prompt-block">
+              <label for="prompt__{{ prompt.key }}" class="label">{{ prompt.label }}</label>
+              <textarea id="prompt__{{ prompt.key }}" name="prompt__{{ prompt.key }}" rows="12">{{ prompt.content }}</textarea>
+            </div>
+            {% endfor %}
+          </div>
+        </form>
+      </section>
+      {% endif %}
+
+      {% if job.output_csv or job.raw_pipeline_csv %}
+      <section class="panel">
+        <h2>Results</h2>
+        <div class="downloads">
+          <a class="button" href="{{ url_for('download_job_bundle', job_id=job.id) }}">Download All Results</a>
+          {% if job.output_csv %}
+          <a class="button subtle" href="{{ url_for('download_job_file', job_id=job.id, filename=job.output_csv) }}">Download Final CSV</a>
+          {% endif %}
+          {% if job.raw_pipeline_csv %}
+          <a class="button subtle" href="{{ url_for('download_job_file', job_id=job.id, filename=job.raw_pipeline_csv) }}">Download Pipeline CSV</a>
+          {% endif %}
+          <a class="button subtle" href="{{ url_for('job_log', job_id=job.id) }}">Download Run Log</a>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if job.error and job.status == "failed" %}
+      <section class="panel error">
+        <h2>Run Error</h2>
+        <p>{{ job.error }}</p>
+      </section>
+      {% endif %}
+
+      {% if job.page_items %}
+      <section class="panel">
+        <h2>Page Preview</h2>
+        <div class="grid">
+          {% for item in job.page_items %}
+          <article class="page-card">
+            <img src="{{ url_for('job_thumb', job_id=job.id, filename=item.thumb_name) }}" alt="Page {{ item.page_num }}">
+            <div class="page-meta">Page {{ item.page_num }}</div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    </main>
+
+    {% if job.status == "running" %}
+    <script>
+      const progressFill = document.getElementById("progress_fill");
+      const stageLabel = document.getElementById("stage_label");
+      const stageHero = document.getElementById("stage_hero");
+      const jobStatus = document.getElementById("job_status");
+      const progressValue = document.getElementById("progress_value");
+      const progressDetail = document.getElementById("progress_detail");
+      const currentOutput = document.getElementById("current_output");
+      const terminalLog = document.getElementById("terminal_log");
+      const statusBanner = document.getElementById("status_banner");
+      const statusTitle = document.getElementById("status_title");
+      const statusMessage = document.getElementById("status_message");
+      const renderBanner = (status, message) => {
+        if (!statusBanner || !statusMessage) return;
+        statusBanner.classList.remove("is-hidden", "notice-error", "notice-warn", "notice-success");
+        if (status === "failed") {
+          statusBanner.classList.add("notice-error");
+        } else if (status === "stopped") {
+          statusBanner.classList.add("notice-warn");
+        } else {
+          statusBanner.classList.add("notice-success");
+        }
+        if (statusTitle) {
+          statusTitle.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+        statusMessage.textContent = message || `Job ${status}.`;
+      };
+      const poll = async () => {
+        const resp = await fetch("{{ url_for('job_status', job_id=job.id) }}", { cache: "no-store" });
+        const data = await resp.json();
+        if (progressFill && typeof data.progress !== "undefined") {
+          progressFill.style.width = `${data.progress}%`;
+        }
+        if (progressValue && typeof data.progress !== "undefined") {
+          progressValue.textContent = `${data.progress}%`;
+        }
+        if (progressDetail && typeof data.progress_detail !== "undefined") {
+          progressDetail.textContent = data.progress_detail || "Waiting for process output...";
+        }
+        if (stageLabel && data.stage) {
+          stageLabel.textContent = data.stage;
+        }
+        if (stageHero && data.stage) {
+          stageHero.textContent = data.stage;
+        }
+        if (jobStatus && data.status) {
+          jobStatus.textContent = data.status;
+        }
+        if (currentOutput && data.current_output) {
+          currentOutput.textContent = data.current_output;
+        }
+        if (terminalLog && typeof data.live_log !== "undefined") {
+          const atBottom = terminalLog.scrollHeight - terminalLog.scrollTop <= terminalLog.clientHeight + 40;
+          terminalLog.textContent = data.live_log || "";
+          if (atBottom) terminalLog.scrollTop = terminalLog.scrollHeight;
+        }
+        if (data.status === "completed" || data.status === "failed" || data.status === "stopped") {
+          renderBanner(data.status, data.error || data.current_output);
+          return;
+        }
+        setTimeout(poll, 3000);
+      };
+      setTimeout(poll, 3000);
+    </script>
+    {% endif %}
+    <script>
+      const toggle = document.getElementById("use_custom_prompts");
+      const editor = document.getElementById("prompt_editor");
+      if (toggle && editor) {
+        const sync = () => editor.classList.toggle("is-hidden", !toggle.checked);
+        toggle.addEventListener("change", sync);
+        sync();
+      }
+    </script>
+  </body>
+  </html>

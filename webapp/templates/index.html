@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manuscript Pipeline</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="shell topbar-inner">
+        <a href="{{ url_for('index') }}" class="brand-mark">Manuscript Pipeline</a>
+        <nav class="topnav" aria-label="Primary">
+          <a href="{{ url_for('index') }}" class="topnav-link is-active">Home</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="shell app-shell">
+      <section class="hero hero-grid">
+        <div>
+          <p class="kicker">Catalog Extraction Console</p>
+          <h1>Upload a PDF, open the job, then choose the exact pages to process.</h1>
+          <p class="lede">The app converts the PDF into reusable page images, keeps a job record for each upload, and runs the extraction pipeline plus WAAMD matching on the range you pick. Each user supplies their own Anthropic API key when they start a run.</p>
+        </div>
+        <aside class="hero-summary">
+          <p class="summary-label">How It Works</p>
+          <ol class="hero-steps">
+            <li>Upload a PDF on the home page.</li>
+            <li>Open the generated job from the uploads list.</li>
+            <li>Choose the page range and run the pipeline.</li>
+          </ol>
+        </aside>
+      </section>
+
+      <section class="panel panel-section">
+        <div class="panel-heading">
+          <div>
+            <p class="kicker section-kicker">New Upload</p>
+            <h2>Convert a PDF into a reusable job</h2>
+          </div>
+        </div>
+        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+          <label for="pdf" class="label">PDF File</label>
+          <input id="pdf" name="pdf" type="file" accept="application/pdf" required>
+          <button type="submit" class="button">Create Job</button>
+        </form>
+      </section>
+
+      <section class="panel panel-section">
+        <div class="panel-heading">
+          <div>
+            <p class="kicker section-kicker">Uploads</p>
+            <h2>Open an existing job</h2>
+          </div>
+          <p class="section-note">{{ jobs|length if jobs else 0 }} upload{% if jobs|length != 1 %}s{% endif %}</p>
+        </div>
+        {% if jobs %}
+        <div class="job-list">
+          {% for job in jobs %}
+          <article class="job-row">
+            <div class="job-main">
+              <div class="job-title">{{ job.pdf_name }}</div>
+              <div class="job-meta">{{ job.id }}{% if job.page_count %} · {{ job.page_count }} pages{% endif %}</div>
+            </div>
+            <div class="job-state">
+              <span class="status-pill status-{{ job.status }}">{{ job.status }}</span>
+              <span class="job-stage">{{ job.stage }}</span>
+            </div>
+            <div class="job-actions">
+              <a class="button subtle" href="{{ url_for('job_view', job_id=job.id) }}">Open Job</a>
+              <form action="{{ url_for('delete_job', job_id=job.id) }}" method="post">
+                <button type="submit" class="button subtle danger">Delete</button>
+              </form>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <h3>No uploads yet</h3>
+          <p>Start by creating a job from a PDF above. After conversion, it will appear here so you can open it and choose which pages to process.</p>
+        </div>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

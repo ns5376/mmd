@@ -1,0 +1,25 @@
+Extract ONLY the FIRST LINE (أولها / incipit) of each manuscript text in Arabic.
+
+What to look for:
+- The catalogue usually labels this with words like:
+  - "أولها:" , "أوله:" , "أوله" , "أولها"
+- It is the first words of the text itself, not of the catalogue description.
+- It often comes near the end of each entry, after the physical description (pages, dimensions, condition, etc.).
+
+Guidelines:
+- For each title listed for this page, extract ONE and ONLY ONE first line in Arabic.
+- You will be given the titles on this page in order. Return the first lines in the same order, one per title.
+- If a title clearly has no first line given in the catalogue, return an empty string "" in that position and keep the order.
+- The first line should be short: only the very beginning of the text (the first phrase or sentence), not a long excerpt.
+- Preserve the exact wording and order as written (including diacritics and punctuation if present).
+- Do NOT translate; keep it in Arabic script only.
+- Do NOT confuse the incipit with the title or with other quotations in the description.
+
+Examples of first lines:
+- "الحمد لله الذي جعل في الكتاب مشفاة للأسقام"
+- "أما بعد حمد الله والصلاة على نبيه فإن هذا كتاب ..."
+
+Return JSON:
+{"values": ["الحمد لله الذي جعل في الكتاب مشفاة للأسقام", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

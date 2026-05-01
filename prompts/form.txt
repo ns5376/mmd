@@ -1,0 +1,28 @@
+Extract ONLY the FORM / GENRE for each manuscript entry.
+
+Primary goal:
+- Extract the Arabic form label for each entry.
+
+Secondary goal:
+- If an explicit English form label is clearly present, you may include it.
+
+Examples of Arabic form labels:
+- كتاب
+- شرح
+- مختصر
+- رسالة
+- جزء
+- فوائد
+
+Guidelines:
+- Keep the order aligned with the manuscript entries on the page.
+- Prefer the Arabic form label when visible; it is the most important output.
+- If the form is inferable from the entry text, infer cautiously.
+- Do not invent long descriptions.
+- Do not extract the title, subject, first line, or copyist here.
+- If the English form is not explicit, leave it blank. A later text-only step will normalize it.
+
+Return JSON:
+{"form_eng": ["", ""], "form_ar": ["كتاب", "شرح"]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

@@ -1,0 +1,26 @@
+Extract ONLY the DATE COPIED field for each manuscript entry.
+
+Target the exact label when it appears:
+- "Date copied AH/CE"
+
+What to look for:
+- Arabic phrases such as:
+  - "تاريخ الفراغ من النسخة"
+  - "تاريخ النسخ"
+  - "نسخ في"
+- English or mixed bilingual catalog wording that gives the same field.
+
+Guidelines:
+- Return one value per manuscript entry, in order.
+- Preserve detailed wording if the catalog gives a descriptive date.
+- If the entry gives a normalized AH/CE form, preserve it.
+- If the catalog writes the date in prose, keep that prose rather than reducing it.
+- If no copying date is present, return an empty string for that entry.
+
+Example:
+"Beginning of Jumād 1166/End of February, beginning of March 1753"
+
+Return JSON:
+{"values": ["Beginning of Jumād 1166/End of February, beginning of March 1753", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

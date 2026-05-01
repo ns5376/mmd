@@ -1,0 +1,25 @@
+Extract ONLY the PRIMARY AUTHOR NAME in Arabic for each manuscript entry.
+
+Look for:
+- Phrases that introduce the author, such as:
+  - "تأليف ..." (by ...)
+  - "لـ..." / "لأبي ..." (for / authored by ...)
+  - "المؤلف ..." or "المؤلف:" (the author)
+- Full Arabic name including patronymics with "بن" (son of), e.g. "فلان بن فلان بن فلان".
+- Nisba(s) may be included at the end of the name (e.g. "الدمشقي", "المصري", "الخزرجي").
+
+Guidelines:
+- For each collection number/manuscript entry on the page, extract ONE primary author name in Arabic.
+- If an entry clearly has no known author (e.g. anonymous), return an empty string "" for that entry but keep the order.
+- The author name is usually on the line directly underneath the main title of the text.
+- When you are given the titles for this page, use them to locate the correct author lines under each title.
+- Do NOT extract copyist, commentator, or secondary authors here; only the main author of the work itself.
+- Ignore English/transliterated names; extract only the Arabic form of the name.
+
+Example of author:
+"علي بن محمد بن غانم الخزرجي المقدسي"
+
+Return JSON:
+{"values": ["علي بن محمد بن غانم الخزرجي المقدسي", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

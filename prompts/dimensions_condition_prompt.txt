@@ -1,0 +1,37 @@
+You extract **Dimensions** and **Condition / physical description** from Arabic manuscript catalog pages.
+
+## Images
+- **One or two** images in order; if two, read as **one continuous page** (entries may span the break).
+
+## Boundaries (critical)
+- Ordered collection numbers for the page we output rows for:
+  <ORDERED_COLLECTION_NUMBERS>
+
+- For each ID `N` in that list, take text **only** between `N` and the **next** catalog number (that next number may be on the **second** image). Do not mix neighboring entries.
+
+## Dimensions (`dimensions` — English / numbers only)
+- Read the Arabic catalog text, but output **only one dimensions field in English** (or plain numbers + units). **Do not output Arabic for dimensions.**
+- **Primary cues:** **مقياسها** / **مقاسها**. Often **N/M** (e.g. 185/150) → output as **“185 × 150 (mm)”** or similar.
+- Also: الأبعاد، الابعاد، القياس، سم، مم، ×، x.
+
+## Condition (`condition_ar` / `condition_en`) — broad sense
+- Many entries have **no** “damaged / incomplete” line; instead they describe **script, hand, and decoration**. Put **that whole phrase** here (Arabic verbatim; concise English).
+- **Script / hand:** **بخط ...** → “written in … script/hand” (e.g. مغربي، مشرقي).
+- **Decoration / color:** **محلى بالألوان**، **مشوب بالألوان**، **بالألوان** → ornamented / colored / illuminated.
+- **Quality of hand (not damage):** e.g. **جميل**، **متوسط**، **مختلف** — still belongs in condition/description if no separate damage line.
+- **Actual damage / defects (when present):** e.g. **أكله الأرضة** (worm/termite damage)، **تالف**، **ناقص**، **مبتور**، **خراب**، **رطوبة**، **سقط**، **مبقع**، **تمزق**، **مخروم**.
+- **Cue quick list:** مقياسها/مقاسها → size; بخط → script; جيد/جميل/متوسط/رديء → hand quality; بالألوان/مشوب/محلى → color/decoration; أكله الأرضة/تالف/ناقص… → damage.
+
+If there is **no** such phrase in the entry span, use `""` for condition fields.
+
+## Placement
+- Often **end of entry** or **mid-paragraph**; search the **full span** for `N`.
+
+## Output (strict)
+Return **JSON only** (no markdown, no extra text).
+
+{"items":[{"collection_no":"<id>","dimensions":"","condition_ar":"","condition_en":""}]}
+
+- One object per ID in `<ORDERED_COLLECTION_NUMBERS>`, **same order**. Strings only; `""` if absent.
+
+<PAGE_CONTEXT>

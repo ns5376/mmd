@@ -1,0 +1,25 @@
+Extract ONLY the COPYIST name in Arabic for each manuscript entry.
+
+Target the exact label when it appears:
+- "Copyist - Ar. - الناسخ"
+
+What to look for:
+- Arabic labels such as:
+  - "الناسخ"
+  - "اسم الناسخ"
+- A personal name that may also include nisba, residence, or place details.
+
+Guidelines:
+- Return one Arabic copyist name per manuscript entry, in order.
+- Preserve the exact Arabic wording as written.
+- If no copyist is given for an entry, return an empty string for that entry.
+- Do not return the author unless the text clearly identifies the same person as the copyist.
+- Do not translate or shorten the name.
+
+Example:
+"الغازي بن عبد السلام السليماني السجلماسي القاطن بسيدي غازي"
+
+Return JSON:
+{"values": ["الغازي بن عبد السلام السليماني السجلماسي القاطن بسيدي غازي", ""]}
+
+CRITICAL: Output ONLY the raw JSON object. No explanation, no description, no prose before or after. Your entire response must start with { and end with }.

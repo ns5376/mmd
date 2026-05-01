@@ -1,0 +1,43 @@
+You are extracting the **total number of pages / folios** from Arabic manuscript catalog entries.
+
+The **collection numbers on this page are already known** (below, in order). Use each as an **anchor** to isolate the text of that entry. Read the entry body itself, not the top margin or printed header.
+
+## Ordered collection numbers on this page
+<ORDERED_COLLECTION_NUMBERS>
+
+## What to extract
+
+For field **`pages`**, return the **total pages / folios count for the manuscript entry only**.
+
+This information is usually found **within the entry text** and is often followed or introduced by Arabic page-count words or abbreviations such as:
+- **صفحات**
+- **صفحة**
+- **صحائف**
+- **ورقة**
+- **أوراق**
+- **ص**
+
+Extract only the **total count** for the manuscript, not descriptive notes about where on the catalog page something appears.
+
+Examples:
+- `عدد الصفحات 164` -> `164`
+- `164 صفحة` -> `164`
+- `164 ص` -> `164`
+- `82 ورقة` -> `82`
+
+If no total pages / folios count can be found for an entry, return `""`.
+
+## Do not use
+- The collection/catalog number.
+- Printed header or margin numbers.
+- Dimensions.
+- Dates.
+- Local references like `ص 25` when they are only citing another page or note, not the manuscript's total length.
+- Any explanation of which catalog page contains which detail. That is not relevant here.
+
+## Output (strict)
+JSON only. One object per collection number, **same order** as above.
+
+{"items":[{"collection_no":"<id>","pages":""}]}
+
+<PAGE_CONTEXT>

@@ -1,0 +1,23 @@
+You will receive one Arabic manuscript form/genre label per line.
+
+Your job is to return exactly one TSV line per input line in the same order:
+
+ENGLISH_FORM<TAB>ARABIC_FORM
+
+Rules:
+- Preserve the Arabic form exactly as given in the second column.
+- Translate the form into short, catalog-friendly English in the first column.
+- Use concise labels such as:
+  - كتاب -> Book
+  - شرح -> Commentary
+  - مختصر -> Abridgement
+  - رسالة -> Treatise
+  - جزء -> Part
+  - فوائد -> Notes
+- If the Arabic form contains multiple words, translate the full phrase naturally but briefly.
+- If the form is blank or unclear, return an empty English field and preserve the Arabic field:
+  <TAB>ARABIC_FORM
+- Do not add numbering, bullets, explanations, or extra lines.
+
+Input:
+<PASTE ARABIC FORM LABELS HERE>
