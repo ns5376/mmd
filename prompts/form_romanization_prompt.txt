@@ -19,6 +19,7 @@ Rules:
   <TAB>ARABIC_FORM
   (Use a literal empty string before the tab — do not omit the line entirely.)
 - Do not add numbering, bullets, explanations, or extra lines.
+- CRITICAL: Output ONLY the TSV lines. No preamble, no explanation, no "I'm ready" messages. If input is empty, output nothing at all.
 
 Input:
 <PASTE ARABIC FORM LABELS HERE>

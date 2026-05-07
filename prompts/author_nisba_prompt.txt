@@ -30,7 +30,7 @@ Output:
 Ibn Khalṣūn	ابن خلصون	أبو عبدالله محمد بن يوسف ابن خلصون
 Rundī	الرندي	محمد بن إبراهيم الرندي
 
-CRITICAL: If the input below is blank or empty, respond with nothing at all — completely empty response, no explanation.
+CRITICAL: Output ONLY the TSV lines. No preamble, no explanation, no "I'm ready" messages. If the input below is blank or empty, output nothing at all — completely empty response.
 
 Now extract nisbas for the following author lines (one per line) and return the results in the required TSV format:
 

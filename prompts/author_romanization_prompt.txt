@@ -20,7 +20,7 @@ Rules:
    - Use apostrophe ' for hamza in the middle of words when needed.
 6) If a name is unclear, still output your best romanization; do not leave the romanization blank.
 
-CRITICAL: If the input below is blank or empty, respond with nothing at all — completely empty response, no explanation.
+CRITICAL: Output ONLY the TSV lines. No preamble, no explanation, no "I'm ready" messages. If the input below is blank or empty, output nothing at all — completely empty response.
 
 Now romanize the following Arabic author names (one per line). Return results in the required two-column format:
 

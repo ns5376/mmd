@@ -668,6 +668,13 @@ if __name__ == "__main__":
             collection_numbers = extract_json_values(raw_coll)
             time.sleep(DELAY_BETWEEN_CALLS)
 
+            # If no collection numbers found, this is a continuation page — skip all remaining steps
+            if not any(v.strip() for v in collection_numbers):
+                print("  [SKIP] No collection numbers on page — continuation page, skipping remaining steps.", flush=True)
+                collection_numbers = []
+                # Leave all other lists empty; combine_fields_for_page handles this gracefully
+                raise StopIteration
+
             # 2. Title (pass collection numbers from this page)
             print("  [2/15] Title...", flush=True)
             title_prompt = load_prompt_file(TITLE_PROMPT_PATH)
@@ -858,11 +865,16 @@ if __name__ == "__main__":
             time.sleep(DELAY_BETWEEN_CALLS)
 
             # 10b. Form normalization / translation (text-only)
-            print("  [10b/15] Form normalization (text-only)...", flush=True)
-            form_norm_template = load_prompt_file(FORM_ROMANIZATION_PROMPT_PATH)
-            form_ar_lines = "\n".join((v or "").strip() for v in form_ar_list)
-            form_norm_prompt = form_norm_template.replace("<PASTE ARABIC FORM LABELS HERE>", form_ar_lines)
-            raw_form_norm = run_text_only(form_norm_prompt, max_tokens=512)
+            _non_empty_forms = [v.strip() for v in form_ar_list if (v or "").strip()]
+            if _non_empty_forms:
+                print("  [10b/15] Form normalization (text-only)...", flush=True)
+                form_norm_template = load_prompt_file(FORM_ROMANIZATION_PROMPT_PATH)
+                form_ar_lines = "\n".join((v or "").strip() for v in form_ar_list)
+                form_norm_prompt = form_norm_template.replace("<PASTE ARABIC FORM LABELS HERE>", form_ar_lines)
+                raw_form_norm = run_text_only(form_norm_prompt, max_tokens=512)
+            else:
+                print("  [10b/15] Form normalization skipped (no forms on page).", flush=True)
+                raw_form_norm = ""
             form_norm_pairs = parse_tsv_two_cols(raw_form_norm, expected_n=max(len(form_ar_list), 1))
             if not form_eng_list:
                 form_eng_list = [""] * len(form_norm_pairs)
@@ -887,6 +899,8 @@ if __name__ == "__main__":
             raw_subject = run_extraction([path], subject_prompt, max_tokens=1024)
             subjects = extract_json_values(raw_subject)
             time.sleep(DELAY_BETWEEN_CALLS)
+        except StopIteration:
+            pass  # Continuation page — no entries start here, all lists stay empty
         except Exception as e:
             err = str(e)
             print(f"  Error: {e}", flush=True)
